@@ -1,0 +1,14 @@
+INDEX VERSION 1.126+/home/cserra/Documents/code/java_102/java_102_project_01/.metadata/.plugins/org.eclipse.jdt.core
+3239371248.index
+571271066.index
+1276502281.index
+1348450988.index
+4279134103.index
+2084860878.index
+1197993722.index
+2971750766.index
+1146852158.index
+1176000474.index
+1500536208.index
+3476585412.index
+229651238.index
