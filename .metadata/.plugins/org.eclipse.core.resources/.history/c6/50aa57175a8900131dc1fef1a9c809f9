@@ -1,0 +1,104 @@
+package Employee;
+
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.JLabel;
+
+public class AddEmployeeDialog extends JDialog {
+
+	private final JPanel contentPanel = new JPanel();
+	private Employee employee= null;
+	private TestGUI parent;
+	/**
+	 * Launch the application.
+	 */
+
+	/**
+	 * Create the dialog.
+	 */
+	public AddEmployeeDialog(TestGUI gui) {
+		init();
+		parent = gui;
+		employee = new Employee();
+	}
+	
+	public AddEmployeeDialog(Employee employeeToEdit) {
+		init();
+		if (employeeToEdit == null) {
+			dispose();
+		}
+		employee = employeeToEdit;
+		populateDialogWithEmployee();
+	}
+	
+	private void init() {
+		setBounds(100, 100, 450, 300);
+		getContentPane().setLayout(new BorderLayout());
+		contentPanel.setLayout(new FlowLayout());
+		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+		getContentPane().add(contentPanel, BorderLayout.CENTER);
+		{
+			JLabel lblNewLabel = new JLabel("New label");
+			contentPanel.add(lblNewLabel);
+		}
+		{
+			JPanel buttonPane = new JPanel();
+			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
+			getContentPane().add(buttonPane, BorderLayout.SOUTH);
+			{
+				JButton okButton = new JButton("OK");
+				okButton.setActionCommand("OK");
+				buttonPane.add(okButton);
+				getRootPane().setDefaultButton(okButton);
+				okButton.addActionListener(new ActionListener() {
+
+					@Override
+					public void actionPerformed(ActionEvent arg0) {
+						if (validateInput()) {
+							commitChanges();
+						}
+					}
+					
+				});
+			}
+			{
+				JButton cancelButton = new JButton("Cancel");
+				cancelButton.setActionCommand("Cancel");
+				buttonPane.add(cancelButton);
+				
+			}
+		}
+	}
+	
+	private void populateDialogWithEmployee() {
+		if (employee == null) { 
+			return;
+		}
+		
+		
+	}
+	
+	private boolean validateInput() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	private void commitChanges() {
+		
+		
+		
+		if (parent != null) {
+			parent.addEmployee(employee);
+		}
+		dispose();
+	}
+	
+
+}
