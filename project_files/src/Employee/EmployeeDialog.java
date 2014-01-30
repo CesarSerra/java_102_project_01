@@ -26,6 +26,7 @@ public class EmployeeDialog extends JDialog {
 	private JFormattedTextField lastNamejTextField;
 	private JFormattedTextField payRatejTextField;
 	private JTextField hoursWorkedjTextField;
+	private static final double MAXPAY = 50.0;
 
 	/**
 	 * Launch the application.
@@ -38,6 +39,7 @@ public class EmployeeDialog extends JDialog {
 	 */
 	public EmployeeDialog(EmployeeGUI gui) 
 	{
+		setTitle("Add/Edit Employee");
 		setResizable(false);
 		init();
 		parent = gui;
@@ -117,7 +119,6 @@ public class EmployeeDialog extends JDialog {
 					}
 					{
 						payRatejTextField = new JFormattedTextField();
-						payRatejTextField.setInputVerifier();
 						panel.add(payRatejTextField);
 						payRatejTextField.setColumns(10);
 					}
@@ -160,18 +161,52 @@ public class EmployeeDialog extends JDialog {
 
 	private boolean validateInput() {
 
+		boolean validInput = true;
+		String msg = "";
 		String firstName = firstNamejTextField.getText().trim();
 		String lastName = lastNamejTextField.getText().trim();
+		
+		if (!(firstName.matches("[a-zA-Z]+$") && lastName.matches("[a-zA-Z]+$"))) {
+			msg = "Problem with Name";
+			return false;
+		}
+		
+		try 
+		{
+			int hours = Integer.parseInt(hoursWorkedjTextField.getText());
+			if(hours > 168)
+			{
+				msg = "Problem with Hours";
+				validInput =  false;
+			}
+			double payRate = Double.parseDouble(payRatejTextField.getText());
+			if(payRate > MAXPAY)
+			{
+				msg = "Problem with  pay rate, cannot exceed 50";
+				validInput = false;
+			}
+			
+			
+		} catch (NumberFormatException ex) 
+		{
+			msg = "Number Format Error";
+			validInput = false;
+		}
 
 		Employee searchDummy = parent.searchForEmployee(firstName, lastName);
 		if ((!newEmployee && searchDummy != employee)
 				|| (newEmployee && searchDummy != null)) {
-			JOptionPane.showMessageDialog(rootPane, "Input Error",
-					"Employee already Found", JOptionPane.WARNING_MESSAGE);
-			return false;
+			msg = "Employee already Found";
+			validInput = false;
 
 		}
-		return true;
+		
+		if (! validInput) {
+			JOptionPane.showMessageDialog(rootPane, msg,
+					"Input Error", JOptionPane.WARNING_MESSAGE);
+		}
+		
+		return validInput;
 	}
 
 	private void commitChanges() {
@@ -182,7 +217,9 @@ public class EmployeeDialog extends JDialog {
 		employee.setPayRate(Double.parseDouble(payRatejTextField.getText()));
 
 		if (newEmployee) {
-			parent.addEmployee(employee);
+			parent.addEmployeeCallback(employee);
+		} else {
+			parent.editEmployeeCallback();
 		}
 		dispose();
 	}

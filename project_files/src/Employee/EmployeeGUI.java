@@ -27,6 +27,7 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import java.awt.Color;
 import javax.swing.JScrollPane;
+import org.eclipse.wb.swing.FocusTraversalOnArray;
 
 
 public class EmployeeGUI extends JFrame 
@@ -45,6 +46,7 @@ public class EmployeeGUI extends JFrame
 	DecimalFormat number = new DecimalFormat("#,##0.00");
 	StringBuilder sb = new StringBuilder();
 	private JComboBox jEmployeeComboBox;
+	private JTextArea jDisplayTextArea;
 	/**
 	 * Launch the application.
 	 */
@@ -151,6 +153,7 @@ public class EmployeeGUI extends JFrame
 	 */
 	public EmployeeGUI()
 	{
+		setTitle("Gross Pay");
 		setResizable(false);
 		initComponents();
 	}
@@ -169,9 +172,20 @@ public class EmployeeGUI extends JFrame
 		jMenuFile.add(jMenuItemClear);
 		
 		JMenuItem jMenuItemPrint = new JMenuItem("Print");
+		jMenuItemPrint.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) 
+			{
+				print();
+			}
+		});
 		jMenuFile.add(jMenuItemPrint);
 		
 		JMenuItem jMenuItemQuit = new JMenuItem("Quit");
+		jMenuItemQuit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				System.exit(0);
+			}
+		});
 		jMenuFile.add(jMenuItemQuit);
 		
 		JMenu jMenuEmployee = new JMenu("Employee Data");
@@ -184,18 +198,37 @@ public class EmployeeGUI extends JFrame
 		{
 			public void actionPerformed(ActionEvent e) 
 			{
-				
+				addEmployee();
 			}
 		});
 		jMenuEmployee.add(jMenuItemNewEmployee);
 		
 		JMenuItem jMenuItemEditEmployee = new JMenuItem("Edit Employee");
+		jMenuItemEditEmployee.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) 
+			{
+				editEmployee();
+			}
+		});
 		jMenuEmployee.add(jMenuItemEditEmployee);
 		
 		JMenuItem jMenuItemDeleteEmployee = new JMenuItem("Delete Employee");
+		jMenuItemDeleteEmployee.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int index = jEmployeeComboBox.getSelectedIndex();
+				employees.remove(index);
+				updateComboBox();
+				ReadXML.commitToFile(employees, FILENAME);
+			}
+		});
 		jMenuEmployee.add(jMenuItemDeleteEmployee);
 		
 		JMenuItem jMenuItemSearchEmployee = new JMenuItem("Search Employee");
+		jMenuItemSearchEmployee.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				search();
+			}
+		});
 		jMenuEmployee.add(jMenuItemSearchEmployee);
 		
 		JMenu jMenuStatistics = new JMenu("Statistics");
@@ -244,6 +277,7 @@ public class EmployeeGUI extends JFrame
 		jButtonDisplay.setMnemonic('D');
 		jButtonDisplay.setBounds(12, 167, 185, 25);
 		contentPane.add(jButtonDisplay);
+		getRootPane().setDefaultButton(jButtonDisplay);
 		
 		jEmployeeComboBox = new JComboBox();
 		jEmployeeComboBox.setBounds(12, 91, 185, 24);
@@ -265,11 +299,12 @@ public class EmployeeGUI extends JFrame
 		jDisplayScrollPane.setBounds(218, 62, 384, 167);
 		contentPane.add(jDisplayScrollPane);
 		
-		final JTextArea jDisplayTextArea = new JTextArea();
+		jDisplayTextArea = new JTextArea();
 		jDisplayTextArea.setEnabled(false);
 		jDisplayTextArea.setDisabledTextColor(Color.BLACK);
 		jDisplayTextArea.setEditable(false);
 		jDisplayScrollPane.setViewportView(jDisplayTextArea);
+		setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{jButtonDisplay, jButtonQuit}));
 		
 		//splash screen
 
@@ -299,17 +334,12 @@ public class EmployeeGUI extends JFrame
 		{
 			public void actionPerformed(ActionEvent e) 
 			{
-				int selectedIndex = jEmployeeComboBox.getSelectedIndex();
-				hoursWorked = employees.get(selectedIndex).getHours();
-				payRate = employees.get(selectedIndex).getPayRate();
-				grossPay = hoursWorked * payRate;
-				sb.append("Employee: " + employees.get(selectedIndex).getFullName() + "\n" + 
-				"Hours Worked: " + number.format(hoursWorked) + "\n" + "Pay Rate: " + number.format(payRate)
-						+ "\n" + "Gross Pay: " + number.format(grossPay) + "\n");
-				display = sb.toString(); 
-				jDisplayTextArea.setText(display);
+				displayGrossPay();
+				
 				
 			}
+
+			
 		});
 		jMenuItemClear.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) 
@@ -352,6 +382,26 @@ public class EmployeeGUI extends JFrame
 		});		
 	}
 	
+	private void search() {
+		String name= JOptionPane.showInputDialog("Enter Name (Last, first):");
+		String[] splitName = name.split(",");
+		
+		int index = searchForEmployeeIndex(splitName[1].trim(), splitName[0].trim());
+		
+		if (index == -1) {
+			JOptionPane.showMessageDialog(rootPane, "Employee " + name + " not found",
+					"Input Error", JOptionPane.WARNING_MESSAGE);
+		}
+		else {
+			jEmployeeComboBox.setSelectedIndex(index);
+			displayGrossPay();
+		}
+		
+	}
+	private void print() 
+	{
+		PrintUtilities.printComponent(this);
+	}
 	private void updateComboBox() {
 		if (arrayDirty == true) {
 			insertionSort();
@@ -363,15 +413,60 @@ public class EmployeeGUI extends JFrame
 		}
 	}
 	
-	public void addEmployee(Employee employee) 
+	private void addEmployee() 
+	{
+		EmployeeDialog dialog = new EmployeeDialog(this);
+		dialog.setVisible(true);
+		dialog.requestFocus();
+	}
+	
+	public void addEmployeeCallback(Employee employee) 
 	{
 		employees.add(employee);
 		arrayDirty = true;
 		updateComboBox();
 		ReadXML.commitToFile(employees,FILENAME);	
 	}
+	private void editEmployee()
+	{
+		int countOfIndex = jEmployeeComboBox.getSelectedIndex();
+		EmployeeDialog dialog = new EmployeeDialog(this,employees.get(countOfIndex));
+		dialog.setVisible(true);
+		dialog.requestFocus();
+	}
+	
+	public void editEmployeeCallback()
+	{
+		updateComboBox();
+		ReadXML.commitToFile(employees, FILENAME);
+	}
+	
+	private void displayGrossPay() {
+		int selectedIndex = jEmployeeComboBox.getSelectedIndex();
+		hoursWorked = employees.get(selectedIndex).getHours();
+		payRate = employees.get(selectedIndex).getPayRate();
+		grossPay = hoursWorked * payRate;
+		sb.append("Employee: " + employees.get(selectedIndex).getFullName() + "\n" + 
+		"Hours Worked: " + number.format(hoursWorked) + "\n" + "Pay Rate: " + number.format(payRate)
+				+ "\n" + "Gross Pay: " + number.format(grossPay) + "\n");
+		display = sb.toString(); 
+		jDisplayTextArea.setText(display);
+		
+	}
 	
 	public Employee searchForEmployee(String firstName, String lastName)
+	{
+		
+		int index = searchForEmployeeIndex(firstName, lastName);
+		
+		if (index != -1) {
+			return employees.get(index);
+		}
+		
+		return null;
+	}
+	
+	public int searchForEmployeeIndex(String firstName, String lastName)
 	{
 		if (arrayDirty) {
 			insertionSort();
@@ -381,11 +476,11 @@ public class EmployeeGUI extends JFrame
 		for (int i = 0; i < count; ++i) {
 			final Employee employee = employees.get(i);
 			if ( lastName.equalsIgnoreCase(employee.getLastName()) && firstName.equalsIgnoreCase(firstName)) {
-				return employee;
+				return i;
 			}
 			
 		}
-		return null;
+		return -1;
 	}
 }
 

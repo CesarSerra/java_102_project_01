@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -15,9 +14,9 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 
@@ -38,9 +37,6 @@ public class ReadXML
 			for (int temp = 0; temp < nList.getLength(); temp++)
 			{
 				Node nNode = nList.item(temp);
-				
-//				System.out.println("HP" + nNode.getNodeName() +"\n" + nNode.getClass().toString());
-				
 				
 				String firstName = "";
 				String lastName = "";
@@ -107,21 +103,30 @@ public class ReadXML
 			final int count = employees.size();
 			for (int i = 0; i < count; ++i) {
 				final Employee employee = employees.get(i);
+				
 				Element employeeElement = employeeDoc.createElement("Employee");
-				Element firstNameElement = (Element) employeeDoc.createElement("FirstName");
+				
+				
+				Element firstNameElement = employeeDoc.createElement("FirstName");
                 firstNameElement.setTextContent(employee.getFirstName());
-				Element lastNameElement = (Element) employeeDoc.createElement("LastName");
-                firstNameElement.setTextContent(employee.getLastName());
-				Element hoursWorkedElement = (Element) employeeDoc.createElement("HoursWorked");
-                firstNameElement.setTextContent(Integer.toString(employee.getHours()));
-				Element payRateElement = (Element) employeeDoc.createElement("PayRate");
-                firstNameElement.setTextContent(Double.toString(employee.getPayRate()));                
                 
-                rootElement.appendChild(employeeElement);
-				rootElement.appendChild(firstNameElement);
-				rootElement.appendChild(lastNameElement);
-				rootElement.appendChild(hoursWorkedElement);
-				rootElement.appendChild(payRateElement);
+				Element lastNameElement = employeeDoc.createElement("LastName");
+				lastNameElement.setTextContent(employee.getLastName());
+                
+                
+				Element hoursWorkedElement = employeeDoc.createElement("HoursWorked");
+				hoursWorkedElement.setTextContent(Integer.toString(employee.getHours()));
+                
+                
+				Element payRateElement = employeeDoc.createElement("PayRate");
+				payRateElement.setTextContent(Double.toString(employee.getPayRate()));                
+                
+                
+				employeeElement.appendChild(firstNameElement);
+				employeeElement.appendChild(lastNameElement);
+				employeeElement.appendChild(hoursWorkedElement);
+				employeeElement.appendChild(payRateElement);
+				rootElement.appendChild(employeeElement);
 			}
 			
 			TransformerFactory transformerFactory = TransformerFactory.newInstance();

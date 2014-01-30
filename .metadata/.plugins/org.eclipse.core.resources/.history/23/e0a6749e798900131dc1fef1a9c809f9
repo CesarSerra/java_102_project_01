@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?><Company>
+    <Employee>
+        <FirstName>13.1</FirstName>
+        <LastName/>
+        <HoursWorked/>
+        <PayRate/>
+    </Employee>
+    <Employee>
+        <FirstName>11.0</FirstName>
+        <LastName/>
+        <HoursWorked/>
+        <PayRate/>
+    </Employee>
+    <Employee>
+        <FirstName>14.5</FirstName>
+        <LastName/>
+        <HoursWorked/>
+        <PayRate/>
+    </Employee>
+</Company>
