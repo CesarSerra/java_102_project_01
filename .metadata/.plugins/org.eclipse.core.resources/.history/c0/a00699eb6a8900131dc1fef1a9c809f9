@@ -65,7 +65,7 @@ public class Employee
 	public String getFullName()
 	{
 		StringBuilder sb = new StringBuilder();
-		String fullName = sb.append( lastNameOfEmployee + ", " + firstNameOfEmployee).toString();
+		String fullName = sb.append( lastNameOfEmployee + " " + firstNameOfEmployee).toString();
 		return fullName;
 	}
 	public double getGrossPay()

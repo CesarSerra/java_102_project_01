@@ -5,7 +5,6 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.InputVerifier;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
@@ -16,40 +15,34 @@ import javax.swing.JLabel;
 import java.awt.GridLayout;
 
 import javax.swing.JTextField;
-import javax.swing.JFormattedTextField;
 
 public class EmployeeDialog extends JDialog {
-	private Employee employee = null;
+	private Employee employee= null;
 	private EmployeeGUI parent;
 	private boolean newEmployee;
-	private JFormattedTextField firstNamejTextField;
-	private JFormattedTextField lastNamejTextField;
-	private JFormattedTextField payRatejTextField;
+	private JTextField firstNamejTextField;
+	private JTextField lastNamejTextField;
+	private JTextField payRatejTextField;
 	private JTextField hoursWorkedjTextField;
-
 	/**
 	 * Launch the application.
 	 */
 
 	/**
 	 * Create the dialog.
-	 * 
 	 * @wbp.parser.constructor
 	 */
-	public EmployeeDialog(EmployeeGUI gui) 
-	{
+	public EmployeeDialog(EmployeeGUI gui) {
 		setResizable(false);
 		init();
 		parent = gui;
 		employee = new Employee();
 		newEmployee = true;
 	}
-
-	public EmployeeDialog(EmployeeGUI gui, Employee employeeToEdit) 
-	{
+	
+	public EmployeeDialog(EmployeeGUI gui, Employee employeeToEdit) {
 		init();
-		if (employeeToEdit == null) 
-		{
+		if (employeeToEdit == null) {
 			dispose();
 		}
 		newEmployee = false;
@@ -57,9 +50,8 @@ public class EmployeeDialog extends JDialog {
 		employee = employeeToEdit;
 		populateDialogWithEmployee();
 	}
-
-	private void init() 
-	{
+	
+	private void init() {
 		setBounds(100, 100, 450, 154);
 		getContentPane().setLayout(new BorderLayout());
 		{
@@ -71,18 +63,15 @@ public class EmployeeDialog extends JDialog {
 				okButton.setActionCommand("OK");
 				buttonPane.add(okButton);
 				getRootPane().setDefaultButton(okButton);
-				okButton.addActionListener(new ActionListener() 
-				{
+				okButton.addActionListener(new ActionListener() {
 
 					@Override
-					public void actionPerformed(ActionEvent arg0) 
-					{
-						if (validateInput()) 
-						{
+					public void actionPerformed(ActionEvent arg0) {
+						if (validateInput()) {
 							commitChanges();
 						}
 					}
-
+					
 				});
 			}
 			{
@@ -98,7 +87,7 @@ public class EmployeeDialog extends JDialog {
 						panel.add(firstNamejLabel);
 					}
 					{
-						firstNamejTextField = new JFormattedTextField();
+						firstNamejTextField = new JTextField();
 						panel.add(firstNamejTextField);
 						firstNamejTextField.setColumns(10);
 					}
@@ -107,7 +96,7 @@ public class EmployeeDialog extends JDialog {
 						panel.add(lastNamejLabel);
 					}
 					{
-						lastNamejTextField = new JFormattedTextField();
+						lastNamejTextField = new JTextField();
 						panel.add(lastNamejTextField);
 						lastNamejTextField.setColumns(10);
 					}
@@ -116,8 +105,7 @@ public class EmployeeDialog extends JDialog {
 						panel.add(payRatejLabel);
 					}
 					{
-						payRatejTextField = new JFormattedTextField();
-						payRatejTextField.setInputVerifier();
+						payRatejTextField = new JTextField();
 						panel.add(payRatejTextField);
 						payRatejTextField.setColumns(10);
 					}
@@ -131,60 +119,64 @@ public class EmployeeDialog extends JDialog {
 						hoursWorkedjTextField.setColumns(10);
 					}
 				}
-				cancelButton.addActionListener(new ActionListener() 
-				{
+				cancelButton.addActionListener(new ActionListener() {
 
 					@Override
-					public void actionPerformed(ActionEvent arg0) 
-					{
+					public void actionPerformed(ActionEvent arg0) {
 						dispose();
 					}
-
+					
 				});
-
+				
 			}
 		}
 	}
-
+	
 	private void populateDialogWithEmployee() 
 	{
 		if (employee == null) 
-		{
+		{ 
 			return;
 		}
 		firstNamejTextField.setText(employee.getFirstName());
 		lastNamejTextField.setText(employee.getLastName());
 		hoursWorkedjTextField.setText(employee.getHours() + "");
-		payRatejTextField.setText(employee.getPayRate() + "");
+		payRatejTextField.setText(employee.getPayRate() + "");	
 	}
-
-	private boolean validateInput() {
-
+	
+	private boolean validateInput() 
+	{
+		
+		
 		String firstName = firstNamejTextField.getText().trim();
 		String lastName = lastNamejTextField.getText().trim();
-
+		
 		Employee searchDummy = parent.searchForEmployee(firstName, lastName);
-		if ((!newEmployee && searchDummy != employee)
-				|| (newEmployee && searchDummy != null)) {
-			JOptionPane.showMessageDialog(rootPane, "Input Error",
-					"Employee already Found", JOptionPane.WARNING_MESSAGE);
+		if((!newEmployee && searchDummy == employee) || searchDummy != null) 
+		{
+			JOptionPane.showMessageDialog(rootPane,
+				    "Input Error",
+				    "Employee already Found",
+				    JOptionPane.WARNING_MESSAGE);
 			return false;
-
+			
 		}
 		return true;
 	}
-
+	
 	private void commitChanges() {
-
+		
 		employee.setFirstName(firstNamejTextField.getText());
 		employee.setLastName(lastNamejTextField.getText());
 		employee.setHours(Integer.parseInt(hoursWorkedjTextField.getText()));
-		employee.setPayRate(Double.parseDouble(payRatejTextField.getText()));
-
-		if (newEmployee) {
+		employee.setPayRate(Double.parseDouble(payRatejTextField.getText()));		
+		
+		if (newEmployee) 
+		{
 			parent.addEmployee(employee);
 		}
 		dispose();
 	}
+	
 
 }
